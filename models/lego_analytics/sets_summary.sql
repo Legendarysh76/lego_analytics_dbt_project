@@ -20,7 +20,7 @@ themes AS (
 )
 
 SELECT
-    s.set_ID,
+    s.set_id,
     s.set_name,
     s.year,
     s.num_of_parts,
