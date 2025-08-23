@@ -1,0 +1,44 @@
+version: 2  # Required dbt metadata version. Keeps track of source schema definitions.
+
+sources:
+  - name: lego_db  # Defining my source as lego_db – this represents my cleaned/staged LEGO data from the Databricks lakehouse.
+    database: lego_catalog  # This is the Unity Catalog where all my databases and schemas live in Databricks.
+    schema: lego_db  # Refers to my cleaned schema where the curated datasets from the raw staging are loaded.
+
+    tables:
+      - name: colors  # List of all LEGO color definitions used to identify parts and elements.
+        description: This table contains unique LEGO color IDs and names. Used to enrich part and element visuals.
+
+      - name: elements  # Mapping of part + color combinations to represent unique LEGO elements.
+        description: Each row represents a unique LEGO element (a part in a specific color). Key for inventory breakdowns.
+
+      - name: inventories  # High-level inventories table linking to sets and components.
+        description: Each inventory ID represents a specific instance of a LEGO set or parts collection.
+
+      - name: inventory_minifigs  # Junction table between inventories and the minifigs they include.
+        description: Helps identify which minifigures are included in each LEGO inventory.
+
+      - name: inventory_parts  # Junction table between inventories and their individual parts.
+        description: Contains the part/color/quantity details for each inventory. Used in set breakdown analysis.
+
+      - name: inventory_sets  # Linking table to map inventories to the actual set numbers.
+        description: Allows me to tie inventories to their parent LEGO sets. Needed for set-level insights.
+
+      - name: minifigs  # Master list of minifigure IDs and names.
+        description: Core reference for all available LEGO minifigs. Used to track appearance and frequency.
+
+      - name: part_categories  # Categories that classify each LEGO part (e.g., Bricks, Plates, Tiles).
+        description: Useful for filtering or grouping parts by category. Enables better insights in dashboards.
+
+      - name: part_relationships  # Parent-child mapping for related LEGO parts (e.g., molds or variants).
+        description: Helps identify part variants or replacements across time. Useful for lifecycle tracking.
+
+      - name: parts  # Master list of LEGO part numbers and names.
+        description: Central parts reference table. Serves as the foundation for parts-based models.
+
+      - name: sets  # Master LEGO sets table with set number and name.
+        description: Contains all LEGO sets metadata. Key for building most high-level dashboards and summaries.
+
+      - name: themes  # LEGO themes hierarchy (e.g., Star Wars, City, Technic).
+        description: Used to group sets into broader themes. Helps in trend analysis across different LEGO lines.
+
