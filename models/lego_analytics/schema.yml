@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: sets_summary
+    description: >
+      Combines LEGO sets with their corresponding themes to create a high-level summary for analytics.
+    columns:
+      - name: set_id
+        description: Unique identifier for each LEGO set.
+      - name: set_name
+        description: Name of the LEGO set.
+      - name: year
+        description: Year the set was released.
+      - name: num_of_parts
+        description: Number of parts in the set.
+      - name: theme_name
+        description: Name of the theme the set belongs to.
