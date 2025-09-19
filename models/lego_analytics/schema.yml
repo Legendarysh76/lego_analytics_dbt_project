@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  # ==============================
+  # Per-set composition metrics
+  # ==============================
+  - name: sets__composition_metrics
+    description: >
+      I build a per-set “richness” profile by joining inventories and parts to compute
+      actual BOM totals, distinct parts/colors, spares, and the dominant color and part
+      category. I also compare the computed parts count vs the catalog-provided count
+      to surface mismatches for QA and content decisions.
+    meta:
+      owner: "analytics-eng"
+      domain: "lego"
+      purpose: "self-serve"
+    tags: ["lego", "sets", "bom", "selfserve"]
+
+    columns:
+      - name: set_id
+        description: "Set identifier (from the cleaned `sets` table)."
+        # tests: [not_null, unique]
+      - name: set_name
+        description: "Human-readable set name."
+      - name: year
+        description: "Release year of the set."
+      - name: theme_name
+        description: "Theme associated with the set (joined from `themes`)."
+
+      - name: provided_num_of_parts
+        description: "Parts count as published in the catalog (source of truth for comparison)."
+      - name: total_parts_from_bom
+        description: "Computed parts count from inventory BOM (Σ quantities across inventory_parts)."
+      - name: parts_count_delta
+        description: "BOM minus provided count; I use this to flag potential data mismatches."
+
+      - name: distinct_parts
+        description: "Distinct part IDs in the BOM; a simple proxy for build complexity."
+      - name: distinct_colors
+        description: "Distinct color IDs in the BOM; a proxy for color palette richness."
+      - name: spare_parts_qty
+        description: "Total quantity of parts flagged as spares."
+
+      - name: top_color_name
+        description: "Dominant color by BOM quantity for the set (helps with visual merchandising)."
+      - name: top_color_qty
+        description: "Quantity of the dominant color."
+      - name: top_part_category
+        description: "Dominant part category by BOM quantity (helps sourcing/planning)."
+      - name: top_part_category_qty
+        description: "Quantity of the dominant part category."
+
+  # ==============================
+  # Theme portfolio KPIs
+  # ==============================
+  - name: themes__portfolio_summary
+    description: >
+      I roll the per-set metrics up to the theme level to produce portfolio KPIs:
+      set count, first/last year, total and average parts, average colors per set,
+      and minifig density. This is the table I point dashboards to for quick theme
+      comparisons and exec summaries.
+    meta:
+      owner: "analytics-eng"
+      domain: "lego"
+      purpose: "portfolio-kpis"
+    tags: ["lego", "themes", "portfolio", "selfserve"]
+
+    columns:
+      - name: theme_name
+        description: "Theme label used for grouping portfolio metrics."
+        # tests: [not_null]
+      - name: sets_count
+        description: "How many sets exist under this theme."
+      - name: first_year
+        description: "Earliest release year of sets in this theme."
+      - name: last_year
+        description: "Most recent release year of sets in this theme."
+      - name: total_parts
+        description: "Sum of BOM parts across all sets in the theme."
+      - name: avg_parts_per_set
+        description: "Average BOM parts per set; a proxy for build size."
+      - name: avg_colors_per_set
+        description: "Average number of distinct colors per set; a proxy for palette richness."
+      - name: avg_minifigs_per_set
+        description: "Average minifig count per set (via inventories → inventory_minifigs)."
+      - name: total_minifigs
+        description: "Total minifigs across all sets in the theme."
+
+  # ==============================
+  # Simple sets + themes summary
+  # ==============================
+  - name: sets_summary
+    description: >
+      I combine LEGO sets with their corresponding themes to create a clean,
+      high-level summary for analytics and quick lookups.
+    meta:
+      owner: "analytics-eng"
+      domain: "lego"
+      purpose: "baseline-join"
+    tags: ["lego", "sets", "themes", "selfserve"]
+
+    columns:
+      - name: set_id
+        description: "Unique identifier for each LEGO set."
+        # tests: [not_null, unique]
+      - name: set_name
+        description: "Name of the LEGO set."
+      - name: year
+        description: "Year the set was released."
+      - name: num_of_parts
+        description: "Number of parts in the set (from the cleaned sets table)."
+      - name: theme_name
+        description: "Name of the theme the set belongs to."
